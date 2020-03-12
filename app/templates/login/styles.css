@@ -1,0 +1,22 @@
+img{
+    width: 2rem;
+    margin-left:1rem;
+}
+.brand_title{
+    font-size: 0.8rem;
+}
+.login_person{
+    position: absolute;
+    right: 10%;
+}
+.login_body{
+    position: absolute;
+    margin-top: 2rem;
+    right: 35%;
+    left: 35%;
+}
+.title_color{
+    color: orange;
+    margin-top: 2rem;
+    text-align:center;
+}
