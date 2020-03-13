@@ -7,14 +7,9 @@
                <form action='./Home.py' method='get' enctype="multipart/form-data">
                   <select class="custom-select">
                      <option selected>Select your Item:</option>
-                     <option value="1">Full meals</option>
-                     <option value="2">Veg Biriyani</option>
-                     <option value="3">Chapati</option>
-                     <option value="4">Parota</option>
-                     <option value="5">Curd rice</option>
-                     <option value="6">Tomato rice</option>
-                     <option value="7">Carrot rice</option>
-                     <option value="8">Chiken rice</option>
+                     {% for i in range(length) %}
+                     <option value={{ i+1 }}>{{ menu[i].itemname}}</option>
+                     {% endfor %}
                   </select>
                   <br><br><br>
                   <div class="input-group mb-3">

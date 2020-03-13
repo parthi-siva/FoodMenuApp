@@ -1,16 +1,19 @@
 from flask import render_template,flash,redirect,url_for
+from werkzeug.urls import url_parse
 from app import app, db
 from app.forms import LoginForm
 from flask_login import current_user, login_user
-from app.models import Employee
+from app.models import Employee, Items
 from flask_login import logout_user
 from flask_login import login_required
 from flask import request
 from app.forms import RegistrationForm
+import datetime
 
 @login_required
 @app.route('/index')
 @app.route('/')
+@login_required
 def index():
     return render_template('base.html', title="Home")
 
@@ -27,7 +30,7 @@ def login():
         login_user(user)
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
-            next_page = url_for('index')
+            next_page = url_for('menu')
         return redirect(next_page)
     return render_template('Login/login.html', form=form, title="Login")
 
@@ -50,7 +53,9 @@ def register():
         return redirect(url_for('login'))
     return render_template('Login/register.html', title='Register', form=form)
 
-@login_required
 @app.route("/menu")
+@login_required
 def menu():
-    return render_template('menu.html', title="Menu")
+    today = datetime.date.today().strftime("%A")
+    menu = Items.query.filter_by(item_nature=today).all()
+    return render_template('menu.html', title="Menu",menu=menu, length=len(menu))
