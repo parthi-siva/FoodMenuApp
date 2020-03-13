@@ -8,6 +8,12 @@ from flask_login import login_required
 from flask import request
 from app.forms import RegistrationForm
 
+@login_required
+@app.route('/index')
+@app.route('/')
+def index():
+    return render_template('base.html', title="Home")
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -24,11 +30,6 @@ def login():
             next_page = url_for('index')
         return redirect(next_page)
     return render_template('Login/login.html', form=form, title="Login")
-
-@login_required
-@app.route('/index')
-def index():
-    return render_template('base.html', title="Home")
 
 @app.route('/logout')
 def logout():
@@ -48,3 +49,8 @@ def register():
         flash('Congratulations, you are now a registered user!')
         return redirect(url_for('login'))
     return render_template('Login/register.html', title='Register', form=form)
+
+@login_required
+@app.route("/menu")
+def menu():
+    return render_template('menu.html', title="Menu")

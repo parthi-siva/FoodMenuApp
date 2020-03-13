@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+         <div class="tab-pane fade show active" id="daily-menu" role="tabpanel" aria-labelledby="nav-home-tab">
+            <div class="Employee_input">
+               <h3>Menu</h3>
+               <form action='./Home.py' method='get' enctype="multipart/form-data">
+                  <select class="custom-select">
+                     <option selected>Select your Item:</option>
+                     <option value="1">Full meals</option>
+                     <option value="2">Veg Biriyani</option>
+                     <option value="3">Chapati</option>
+                     <option value="4">Parota</option>
+                     <option value="5">Curd rice</option>
+                     <option value="6">Tomato rice</option>
+                     <option value="7">Carrot rice</option>
+                     <option value="8">Chiken rice</option>
+                  </select>
+                  <br><br><br>
+                  <div class="input-group mb-3">
+                     <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-addon3">Enter Quantity:</span>
+                     </div>
+                     <input type="number" class="form-control" id="basic-url" aria-describedby="basic-addon3">
+                  </div>
+               </form>
+               <div>
+                  <button type="button" value="Submit" type="submit" class="btn btn-primary text-center">Submit</button>
+               </div>
+            </div>
+         </div>
+
+{% endblock %}
