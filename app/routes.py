@@ -6,6 +6,7 @@ from flask_login import current_user, login_user, logout_user, login_required
 from app.models import Employee, Items, Order
 from flask import request
 import datetime
+from collections import defaultdict
 
 @login_required
 @app.route('/index')
@@ -65,3 +66,13 @@ def menu():
         db.session.commit()
         return redirect(url_for('menu'))
     return render_template("menu.html", form=form)
+
+@app.route("/orders", methods=['GET', 'POST'])
+@login_required
+def Myorders():
+    empid = Employee.query.filter_by(email=current_user.email).first()
+    orderdetails = defaultdict(int)
+    for val in Order().query.filter_by(e_id=empid.id).all():
+        itemName = Items.query.filter_by(itemid=val.item_id).first()
+        orderdetails[itemName.itemname] += 1
+    return render_template("orders.html", data=orderdetails)
