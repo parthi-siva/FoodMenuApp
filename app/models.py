@@ -2,7 +2,10 @@ from datetime import datetime
 from app import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
-from app import login
+from app import login, admin
+from flask_admin.contrib.sqla import ModelView
+from flask_admin import BaseView, expose
+from flask_admin.contrib.sqla.filters import FilterEqual
 
 @login.user_loader
 def load_user(id):
@@ -31,7 +34,7 @@ class Items(db.Model):
     item_nature = db.Column(db.String(64))
     orderedItem = db.relationship('Orders', backref='ordereditem', lazy='dynamic')
     def __repr__(self):
-        return 'Item Name'.format(self.itemname)
+        return '<Item Name> : {}'.format(self.itemname)
 
 class Orders(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -41,3 +44,19 @@ class Orders(db.Model):
     order_date = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     def __repr__(self):
         return '<Item id : {}>'.format(self.item_id)
+
+class Itemsview(ModelView):
+    form_columns = ["itemid", "itemname", "price", "item_nature"]
+
+class Orderview(ModelView):
+    column_filters = [FilterEqual(Orders.order_date, datetime.utcnow())]
+
+class TodayOrder(BaseView):
+    @expose("/")
+    def index(self):
+        return self.render("admin/dayorder.html")
+
+
+admin.add_view(Itemsview(Items,db.session))
+admin.add_view(Orderview(Orders,db.session))
+admin.add_view(TodayOrder(name="Daily Aggregate", endpoint="dayorder"))
