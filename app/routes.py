@@ -3,7 +3,7 @@ from werkzeug.urls import url_parse
 from app import app, db
 from app.forms import LoginForm, RegistrationForm, ChoiceMenu
 from flask_login import current_user, login_user, logout_user, login_required
-from app.models import Employee, Items, Order
+from app.models import Employee, Items, Orders
 from flask import request
 import datetime
 from collections import defaultdict
@@ -61,8 +61,13 @@ def menu():
     form.foodoption.choices = [(itm.itemid, itm.itemname) for itm in  items]
     if form.validate_on_submit():
         empid = Employee.query.filter_by(email=current_user.email).first()
-        orders = Order(item_id=form.foodoption.data, e_id=empid.id, quantity=form.quantity.data)
-        db.session.add(orders)
+        alreadyorderd = Orders.query.filter_by(item_id=form.foodoption.data, e_id=empid.id).first()
+        if alreadyorderd is None:
+            orders = Orders(item_id=form.foodoption.data, e_id=empid.id, quantity=form.quantity.data)
+            db.session.add(orders)
+            db.session.commit()
+            return redirect(url_for('menu'))
+        alreadyorderd.quantity += form.quantity.data
         db.session.commit()
         return redirect(url_for('menu'))
     return render_template("menu.html", form=form)
@@ -71,8 +76,34 @@ def menu():
 @login_required
 def Myorders():
     empid = Employee.query.filter_by(email=current_user.email).first()
-    orderdetails = defaultdict(int)
-    for val in Order().query.filter_by(e_id=empid.id).all():
+    orderdetails = {}
+    for val in Orders().query.filter_by(e_id=empid.id).all():
         itemName = Items.query.filter_by(itemid=val.item_id).first()
-        orderdetails[itemName.itemname] += 1
+        orderdetails.update({ itemName.itemname : (val.quantity,val.id) })
     return render_template("orders.html", data=orderdetails)
+
+@app.route("/orders/<int:order_id>/update", methods=['GET', 'POST'])
+@login_required
+def editorders(order_id):
+    order = Orders().query.filter_by(id=order_id).first()
+    itemName = Items.query.filter_by(itemid=order.item_id).first()
+    form = ChoiceMenu()
+    form.foodoption.choices = [(order.item_id, itemName.itemname)]
+    #print(order.item_id,order.quantity, form.quantity.data)
+    if form.validate_on_submit():
+        order.item_id = form.foodoption.data 
+        order.quantity = form.quantity.data
+        db.session.commit()
+        return redirect(url_for("Myorders"))
+    elif request.method == "GET":
+        form.foodoption.choices = [(order.item_id, itemName.itemname)]
+        form.quantity.data = order.quantity
+    return render_template("menu.html", form=form)
+
+@app.route("/orders/<int:order_id>/delete", methods=['GET', 'POST'])
+@login_required
+def deleteorder(order_id):
+    order = Orders().query.filter_by(id=order_id).first()
+    db.session.delete(order)
+    db.session.commit()
+    return redirect(url_for("Myorders"))

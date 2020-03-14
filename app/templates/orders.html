@@ -7,8 +7,11 @@
     <ul class="list-group">
       {% for item in data %}
       <li class="list-group-item d-flex justify-content-between align-items-center">
-      {{ item }}
-      <span class="badge badge-primary badge-pill">{{ data[item] }}</span>
+      <a href={{ url_for("editorders", order_id=data[item][1])}}>{{ item }}</a> 
+      <span class="badge badge-primary badge-pill">{{ data[item][0] }}</span>
+      <button type="button" class="close" aria-label="Close">
+        <span aria-hidden="true"><a href={{ url_for("deleteorder", order_id=data[item][1])}}>&times;</a></span>
+      </button>
       </li>
       {% endfor %}
     </ul>
