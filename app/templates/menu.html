@@ -1,28 +1,43 @@
 {% extends "base.html" %}
 
 {% block content %}
-         <div class="tab-pane fade show active" id="daily-menu" role="tabpanel" aria-labelledby="nav-home-tab">
-            <div class="Employee_input">
-               <h3>Menu</h3>
-               <form action='./Home.py' method='get' enctype="multipart/form-data">
-                  <select class="custom-select">
-                     <option selected>Select your Item:</option>
-                     {% for i in range(length) %}
-                     <option value={{ i+1 }}>{{ menu[i].itemname}}</option>
-                     {% endfor %}
-                  </select>
-                  <br><br><br>
-                  <div class="input-group mb-3">
-                     <div class="input-group-prepend">
-                        <span class="input-group-text" id="basic-addon3">Enter Quantity:</span>
-                     </div>
-                     <input type="number" class="form-control" id="basic-url" aria-describedby="basic-addon3">
-                  </div>
-               </form>
-               <div>
-                  <button type="button" value="Submit" type="submit" class="btn btn-primary text-center">Submit</button>
+<div class="card fat">
+  <div class="card-body">
+    <h4 class="card-title">Menu</h4>
+    <form method="POST" class="my-login-validation" novalidate="">
+      {{ form.hidden_tag() }}
+      <div class="form-group">
+        {{ form.foodoption( class_="custom-select") }}
+            <ul>
+               {% for error in form.foodoption.errors %}
+               <li style="color: red;">
+               {{ error }}                        
+               </li>
+               {% endfor %}
+            </ul>
+      </div>
+      <br>
+      <div class="form-group">
+         <div class="input-group mb-3">
+               <div class="input-group-prepend">
+                   <span class="input-group-text" id="basic-addon3">Enter Quantity:</span>
                </div>
-            </div>
+               {{ form.quantity(class_="form-control") }}
+            <ul>
+               {% for error in form.quantity.errors %}
+               <li style="color: red;">
+               {{ error }}                        
+               </li>
+               {% endfor %}
+            </ul>
          </div>
+      </div>
+      <br>
+      <div class="form-group m-0">
+        <p> {{ form.submit(class_= "btn btn-primary mb-2") }} </p>
+      </div>
+    </form>
+  </div>
+</div>
 
 {% endblock %}

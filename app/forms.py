@@ -1,19 +1,8 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
+from wtforms import StringField, PasswordField, SubmitField, SelectField, IntegerField, validators
 from wtforms.validators import DataRequired, Length, Email, EqualTo
-from app.models import Employee
-
-class RegistrationForm(FlaskForm):
-    username = StringField('Username',
-                           validators=[DataRequired(), Length(min=2, max=20)])
-    email = StringField('Email',
-                        validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    confirm_password = PasswordField('Confirm Password',
-                                     validators=[DataRequired(), EqualTo('password')])
-    submit = SubmitField('Sign Up')
-
-
+from app.models import Employee, Items
+import datetime
 
 class LoginForm(FlaskForm):
     username = StringField('Email',
@@ -38,3 +27,8 @@ class RegistrationForm(FlaskForm):
         user = Employee.query.filter_by(email=email.data).first()
         if user is not None:
             raise ValidationError('Please use a different email address.')
+
+class ChoiceMenu(FlaskForm):
+    foodoption = SelectField("Menu", validators=[DataRequired()],coerce=int)
+    quantity = IntegerField("Quantity",validators=[DataRequired(),validators.NumberRange(min=1, max=10)])
+    submit = SubmitField('Order')

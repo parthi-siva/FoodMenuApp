@@ -31,7 +31,7 @@ class Items(db.Model):
     item_nature = db.Column(db.String(64))
     orderedItem = db.relationship('Order', backref='ordereditem', lazy='dynamic')
     def __repr__(self):
-        return '<Item Name : {}>'.format(self.itemname)
+        return 'Item Name'.format(self.itemname)
 
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
