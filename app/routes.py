@@ -3,7 +3,7 @@ from flask import request
 from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
 from app import app, db
-from app.forms import LoginForm, RegistrationForm, ChoiceMenu
+from app.forms import LoginForm, RegistrationForm, ChoiceMenu, ReportForm
 from app.models import Employee, Items, Orders
 from datetime import date
 from collections import defaultdict
@@ -118,6 +118,8 @@ def deleteorder(order_id):
     db.session.commit()
     return redirect(url_for("Myorders"))
 
+@app.route("/report", methods=['GET', 'POST'])
 @login_required
 def report():
-    pass
+    form = ReportForm()
+    return render_template("report.html", form=form)

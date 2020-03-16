@@ -1,6 +1,10 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, SelectField, IntegerField, validators
+from wtforms import (StringField,
+                    PasswordField,
+                    SubmitField,
+                    SelectField, IntegerField, validators)
 from wtforms.validators import DataRequired, Length, Email, EqualTo
+from wtforms.fields.html5 import DateField
 from app.models import Employee, Items
 import datetime
 
@@ -32,3 +36,8 @@ class ChoiceMenu(FlaskForm):
     foodoption = SelectField("Menu", validators=[DataRequired()],coerce=int)
     quantity = IntegerField("Quantity",validators=[DataRequired(),validators.NumberRange(min=1, max=10)])
     submit = SubmitField('Order')
+
+class ReportForm(FlaskForm):
+    startfield = DateField('Start Date', format='%Y-%m-%d')
+    endfield = DateField('End Date', format='%Y-%m-%d')
+    submit = SubmitField('Report')
