@@ -38,8 +38,8 @@ class Items(db.Model):
 
 class Orders(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    item_id = db.Column(db.Integer, db.ForeignKey("employee.id"))
-    e_id = db.Column(db.Integer, db.ForeignKey("items.itemid"))
+    item_id = db.Column(db.Integer, db.ForeignKey("items.itemid"))
+    e_id = db.Column(db.Integer, db.ForeignKey("employee.id"))
     quantity = db.Column(db.Integer)
     order_date = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     def __repr__(self):
@@ -48,15 +48,4 @@ class Orders(db.Model):
 class Itemsview(ModelView):
     form_columns = ["itemid", "itemname", "price", "item_nature"]
 
-class Orderview(ModelView):
-    column_filters = [FilterEqual(Orders.order_date, datetime.utcnow())]
-
-class TodayOrder(BaseView):
-    @expose("/")
-    def index(self):
-        return self.render("admin/dayorder.html")
-
-
 admin.add_view(Itemsview(Items,db.session))
-admin.add_view(Orderview(Orders,db.session))
-admin.add_view(TodayOrder(name="Daily Aggregate", endpoint="dayorder"))
