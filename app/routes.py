@@ -5,8 +5,10 @@ from werkzeug.urls import url_parse
 from app import app, db
 from app.forms import LoginForm, RegistrationForm, ChoiceMenu
 from app.models import Employee, Items, Orders
-import datetime
+from datetime import date
 from collections import defaultdict
+from datetime import datetime
+import time
 
 @login_required
 @app.route('/index')
@@ -52,10 +54,16 @@ def register():
         return redirect(url_for('login'))
     return render_template('Login/register.html', title='Register', form=form)
 
+def datetime_from_utc_to_local():
+    now_timestamp = time.time()
+    offset = datetime.fromtimestamp(now_timestamp) - datetime.utcfromtimestamp(now_timestamp)
+    return datetime.strptime((datetime.utcnow() + offset).strftime("%Y-%m-%d %H:%M:%S"),
+                "%Y-%m-%d %H:%M:%S")
+
 @app.route("/menu", methods=['GET', 'POST'])
 @login_required
 def menu():
-    today = datetime.date.today().strftime("%A")
+    today = date.today().strftime("%A")
     items = Items.query.filter_by(item_nature=today).all()
     form = ChoiceMenu()
     form.foodoption.choices = [(itm.itemid, itm.itemname) for itm in  items]
@@ -63,7 +71,8 @@ def menu():
         empid = Employee.query.filter_by(email=current_user.email).first()
         alreadyorderd = Orders.query.filter_by(item_id=form.foodoption.data, e_id=empid.id).first()
         if alreadyorderd is None:
-            orders = Orders(item_id=form.foodoption.data, e_id=empid.id, quantity=form.quantity.data)
+            orders = Orders(item_id=form.foodoption.data, e_id=empid.id,
+                            quantity=form.quantity.data,order_date=datetime_from_utc_to_local())
             db.session.add(orders)
             db.session.commit()
             return redirect(url_for('menu'))
@@ -91,8 +100,9 @@ def editorders(order_id):
     form.foodoption.choices = [(order.item_id, itemName.itemname)]
     #print(order.item_id,order.quantity, form.quantity.data)
     if form.validate_on_submit():
-        order.item_id = form.foodoption.data 
+        order.item_id = form.foodoption.data
         order.quantity = form.quantity.data
+        order.order_date = datetime_from_utc_to_local()
         db.session.commit()
         return redirect(url_for("Myorders"))
     elif request.method == "GET":
@@ -107,3 +117,7 @@ def deleteorder(order_id):
     db.session.delete(order)
     db.session.commit()
     return redirect(url_for("Myorders"))
+
+@login_required
+def report():
+    pass

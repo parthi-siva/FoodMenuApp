@@ -41,7 +41,7 @@ class Orders(db.Model):
     item_id = db.Column(db.Integer, db.ForeignKey("items.itemid"))
     e_id = db.Column(db.Integer, db.ForeignKey("employee.id"))
     quantity = db.Column(db.Integer)
-    order_date = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    order_date = db.Column(db.DateTime, index=True)
     def __repr__(self):
         return '<Item id : {}>'.format(self.item_id)
 
