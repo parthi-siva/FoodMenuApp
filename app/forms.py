@@ -38,6 +38,13 @@ class ChoiceMenu(FlaskForm):
     submit = SubmitField('Order')
 
 class ReportForm(FlaskForm):
-    startfield = DateField('Start Date', format='%Y-%m-%d')
-    endfield = DateField('End Date', format='%Y-%m-%d')
+    startdate = DateField('Start Date', format='%d/%m/%Y')
+    enddate = DateField('End Date', format='%d/%m/%Y')
     submit = SubmitField('Report')
+
+    def validate_on_submit(self):
+            result = super(ReportForm, self).validate()
+            if (self.startdate.data>self.enddate.data):
+                return False
+            else:
+                return result

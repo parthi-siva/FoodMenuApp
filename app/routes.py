@@ -122,4 +122,10 @@ def deleteorder(order_id):
 @login_required
 def report():
     form = ReportForm()
+    if form.validate_on_submit():
+        if form.startdate.data == form.enddate.date:
+            pass
+        flash('Correct date range! {}'.format(form.startdate.data))
+    else:
+        flash('wrong date range!')
     return render_template("report.html", form=form)
