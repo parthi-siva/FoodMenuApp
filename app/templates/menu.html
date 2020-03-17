@@ -11,7 +11,7 @@
             <ul>
                {% for error in form.foodoption.errors %}
                <li style="color: red;">
-               {{ error }}                        
+               {{ error }}
                </li>
                {% endfor %}
             </ul>
@@ -26,7 +26,7 @@
             <ul>
                {% for error in form.quantity.errors %}
                <li style="color: red;">
-               {{ error }}                        
+               {{ error }}
                </li>
                {% endfor %}
             </ul>
@@ -34,9 +34,15 @@
       </div>
       <br>
       <div class="form-group m-0">
-        <p> {{ form.submit(class_= "btn btn-primary mb-2") }} </p>
+        <p> {{ form.submit(class_= "btn btn-primary mb-2", id="menusubmit") }} </p>
       </div>
     </form>
   </div>
 </div>
+{% if disabletime.tm_hour == 10 and disabletime.tm_min > 30 %}
+<script>
+  document.getElementById('menusubmit').disabled="True"
+</script>
+{% endif %}
+
 {% endblock %}

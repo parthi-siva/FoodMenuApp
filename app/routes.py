@@ -1,5 +1,5 @@
 from flask import render_template,flash,redirect,url_for
-from flask import request
+from flask import request, session
 from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
 from app import app, db
@@ -79,7 +79,7 @@ def menu():
         alreadyorderd.quantity += form.quantity.data
         db.session.commit()
         return redirect(url_for('menu'))
-    return render_template("menu.html", form=form)
+    return render_template("menu.html", form=form, disabletime=datetime_from_utc_to_local().timetuple())
 
 @app.route("/orders", methods=['GET', 'POST'])
 @login_required
@@ -123,9 +123,17 @@ def deleteorder(order_id):
 def report():
     form = ReportForm()
     if form.validate_on_submit():
-        if form.startdate.data == form.enddate.date:
-            pass
-        flash('Correct date range! {}'.format(form.startdate.data))
-    else:
-        flash('wrong date range!')
-    return render_template("report.html", form=form)
+        session["startdate"] = form.startdate.data
+        session["enddate"] = form.enddate.data
+        return redirect(url_for("expense"))
+    return render_template("report.html", form=form )
+
+@app.route("/expense")
+@login_required
+def expense():
+    print((session["startdate"]))
+    page = request.args.get("page",1,type=int)
+    report = Orders.query.filter(
+                                Orders.order_date.between(session["startdate"],session["startdate"])). \
+                                order_by(Orders.order_date).paginate(page=page,per_page=1)
+    return render_template("expense.html", report=report, datetime=datetime)

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<br><br>
+<table id="dtBasicExample" class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
+  <thead>
+    <tr>
+      <th class="th-sm">Item</th>
+      <th class="th-sm">Date</th>
+      <th class="th-sm">Price</th>
+      <th class="th-sm">Quantity</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for ord_ in report.items %}
+      <tr>
+        <td>{{ ord_.orderedItem.itemname }}</td>
+        <td>{{ datetime.strptime(ord_.order_date).strftime("%Y-%m-%d") }}</td>
+        <td>{{ ord_.orderedItem.price }}</td>
+        <td>{{ ord_.quantity }}</td>
+      </tr>
+      {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

@@ -7,6 +7,7 @@ from wtforms.validators import DataRequired, Length, Email, EqualTo
 from wtforms.fields.html5 import DateField
 from app.models import Employee, Items
 import datetime
+from datetime import date
 
 class LoginForm(FlaskForm):
     username = StringField('Email',
@@ -38,13 +39,13 @@ class ChoiceMenu(FlaskForm):
     submit = SubmitField('Order')
 
 class ReportForm(FlaskForm):
-    startdate = DateField('Start Date', format='%d/%m/%Y')
-    enddate = DateField('End Date', format='%d/%m/%Y')
+    startdate = DateField('Start Date', default=date.today)
+    enddate = DateField('End Date', default=date.today)
     submit = SubmitField('Report')
 
     def validate_on_submit(self):
-            result = super(ReportForm, self).validate()
-            if (self.startdate.data>self.enddate.data):
-                return False
-            else:
-                return result
+        result = super(ReportForm, self).validate()
+        if (self.startdate.data > self.enddate.data):
+            return False
+        else:
+            return result
