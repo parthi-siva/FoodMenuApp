@@ -131,9 +131,11 @@ def report():
 @app.route("/expense")
 @login_required
 def expense():
-    print((session["startdate"]))
+    startdate = datetime.strptime(session["startdate"],"%a, %d %b %Y %H:%M:%S %Z")
+    enddate = datetime.strptime(session["enddate"],"%a, %d %b %Y %H:%M:%S %Z")
+    print(startdate)
     page = request.args.get("page",1,type=int)
     report = Orders.query.filter(
-                                Orders.order_date.between(session["startdate"],session["startdate"])). \
+                                Orders.order_date.between(startdate,enddate)). \
                                 order_by(Orders.order_date).paginate(page=page,per_page=1)
     return render_template("expense.html", report=report, datetime=datetime)
