@@ -10,14 +10,14 @@ import datetime
 from datetime import date
 
 class LoginForm(FlaskForm):
-    username = StringField('Email',
-                        validators=[DataRequired(), Email()])
+    username = StringField('Employee ID',
+                        validators=[DataRequired(),])
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Sign In')
 
 class RegistrationForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
-    email = StringField('Email', validators=[DataRequired(), Email()])
+    emp_id = StringField('Employee ID', validators=[DataRequired()])
+    name = StringField('Employee ID', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
     password2 = PasswordField(
         'Repeat Password', validators=[DataRequired(), EqualTo('password')])
@@ -26,7 +26,7 @@ class RegistrationForm(FlaskForm):
     def validate_username(self, username):
         user = Employee.query.filter_by(ename=username.data).first()
         if user is not None:
-            raise ValidationError('Please use a different username.')
+            raise ValidationError('Employee ID already exists.')
 
     def validate_email(self, email):
         user = Employee.query.filter_by(email=email.data).first()

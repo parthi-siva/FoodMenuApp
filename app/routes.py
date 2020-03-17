@@ -1,14 +1,13 @@
+from datetime import date, datetime
+from collections import defaultdict
+import time
 from flask import render_template,flash,redirect,url_for
 from flask import request, session
-from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
+from flask_login import current_user, login_user, logout_user, login_required
 from app import app, db
 from app.forms import LoginForm, RegistrationForm, ChoiceMenu, ReportForm
 from app.models import Employee, Items, Orders
-from datetime import date
-from collections import defaultdict
-from datetime import datetime
-import time
 
 @login_required
 @app.route('/index')
@@ -23,12 +22,13 @@ def login():
         return redirect(url_for('index'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = Employee.query.filter_by(email=form.username.data).first()
+        user = Employee.query.filter_by(id=form.username.data).first()
+        print(form.username.data)
         if user is None or not user.check_password(form.password.data):
             flash('Invalid username or password')
             return redirect(url_for('login'))
         login_user(user)
-        current_user.email = form.username.data
+        current_user.empid = form.username.data
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('menu')
@@ -57,8 +57,7 @@ def register():
 def datetime_from_utc_to_local():
     now_timestamp = time.time()
     offset = datetime.fromtimestamp(now_timestamp) - datetime.utcfromtimestamp(now_timestamp)
-    return datetime.strptime((datetime.utcnow() + offset).strftime("%Y-%m-%d %H:%M:%S"),
-                "%Y-%m-%d %H:%M:%S")
+    return datetime.strptime((datetime.utcnow() + offset).strftime("%Y-%m-%d"), "%Y-%m-%d")
 
 @app.route("/menu", methods=['GET', 'POST'])
 @login_required
@@ -69,26 +68,27 @@ def menu():
     form.foodoption.choices = [(itm.itemid, itm.itemname) for itm in  items]
     if form.validate_on_submit():
         empid = Employee.query.filter_by(email=current_user.email).first()
-        alreadyorderd = Orders.query.filter_by(item_id=form.foodoption.data, e_id=empid.id).first()
+        alreadyorderd = Orders.query.filter_by(item_id=form.foodoption.data, e_id=current_user.empid).first()
         if alreadyorderd is None:
-            orders = Orders(item_id=form.foodoption.data, e_id=empid.id,
-                            quantity=form.quantity.data,order_date=datetime_from_utc_to_local())
+            orders = Orders(item_id=form.foodoption.data, e_id=current_user.empid,
+                            quantity=form.quantity.data, order_date=datetime_from_utc_to_local())
             db.session.add(orders)
             db.session.commit()
             return redirect(url_for('menu'))
         alreadyorderd.quantity += form.quantity.data
         db.session.commit()
         return redirect(url_for('menu'))
-    return render_template("menu.html", form=form, disabletime=datetime_from_utc_to_local().timetuple())
+    return render_template("menu.html", form=form, 
+                           disabletime=datetime_from_utc_to_local().timetuple())
 
 @app.route("/orders", methods=['GET', 'POST'])
 @login_required
 def Myorders():
     empid = Employee.query.filter_by(email=current_user.email).first()
     orderdetails = {}
-    for val in Orders().query.filter_by(e_id=empid.id).all():
+    for val in Orders().query.filter_by(e_id=current_user.empid).all():
         itemName = Items.query.filter_by(itemid=val.item_id).first()
-        orderdetails.update({ itemName.itemname : (val.quantity,val.id) })
+        orderdetails.update({itemName.itemname : (val.quantity,val.id)})
     return render_template("orders.html", data=orderdetails)
 
 @app.route("/orders/<int:order_id>/update", methods=['GET', 'POST'])
@@ -133,7 +133,7 @@ def report():
 def expense():
     startdate = datetime.strptime(session["startdate"],"%a, %d %b %Y %H:%M:%S %Z")
     enddate = datetime.strptime(session["enddate"],"%a, %d %b %Y %H:%M:%S %Z")
-    print(startdate)
+    print(startdate, enddate)
     page = request.args.get("page",1,type=int)
     report = Orders.query.filter(
                                 Orders.order_date.between(startdate,enddate)). \

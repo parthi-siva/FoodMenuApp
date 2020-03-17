@@ -14,7 +14,7 @@ def load_user(id):
 class Employee(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     ename = db.Column(db.String(64), index=True, unique=True)
-    email = db.Column(db.String(120), index=True, unique=True)
+    emp_id = db.Column(db.String(64), index=True, unique=True)
     password_hash = db.Column(db.String(128))
     order = db.relationship('Orders', backref='orders', lazy='dynamic')
 

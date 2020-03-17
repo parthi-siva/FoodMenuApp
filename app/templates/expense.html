@@ -14,12 +14,23 @@
   <tbody>
     {% for ord_ in report.items %}
       <tr>
-        <td>{{ ord_.orderedItem.itemname }}</td>
-        <td>{{ datetime.strptime(ord_.order_date).strftime("%Y-%m-%d") }}</td>
-        <td>{{ ord_.orderedItem.price }}</td>
+        <td>{{ ord_.ordereditem.itemname }}</td>
+        <td>{{ ord_.order_date.strftime("%Y-%m-%d") }}</td>
+        <td>{{ ord_.ordereditem.price }}</td>
         <td>{{ ord_.quantity }}</td>
       </tr>
       {% endfor %}
   </tbody>
 </table>
+{% for page_num in report.iter_pages()%}
+  {% if page_num %}
+    {% if report.page ==  page_num %}
+      <a class="btn btn-info mb-4" href="{{ url_for('expense', page=page_num) }}"> {{ page_num }} </a>
+    {% else %}
+      <a class="btn btn-outline-info mb-4" href="{{ url_for('expense', page=page_num) }}"> {{ page_num }} </a>
+    {% endif %}
+  {% else %}
+  ...
+  {% endif %}
+{% endfor %} 
 {% endblock %}
