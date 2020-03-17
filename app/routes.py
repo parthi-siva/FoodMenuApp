@@ -22,18 +22,20 @@ def login():
         return redirect(url_for('index'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = Employee.query.filter_by(id=form.username.data).first()
+        user = Employee.query.filter_by(emp_id=form.username.data).first()
         print(form.username.data)
         if user is None or not user.check_password(form.password.data):
             flash('Invalid username or password')
             return redirect(url_for('login'))
         login_user(user)
-        current_user.empid = form.username.data
+        current_user.emp_id = form.username.data
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('menu')
         return redirect(next_page)
     return render_template('Login/login.html', form=form, title="Login")
+
+lambda x : Employee.query.filter_by()
 
 @app.route('/logout')
 def logout():
@@ -46,7 +48,7 @@ def register():
         return redirect(url_for('index'))
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = Employee(ename=form.username.data, email=form.email.data)
+        user = Employee(ename=form.name.data, emp_id=form.emp_id.data)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
@@ -67,10 +69,9 @@ def menu():
     form = ChoiceMenu()
     form.foodoption.choices = [(itm.itemid, itm.itemname) for itm in  items]
     if form.validate_on_submit():
-        empid = Employee.query.filter_by(email=current_user.email).first()
-        alreadyorderd = Orders.query.filter_by(item_id=form.foodoption.data, e_id=current_user.empid).first()
+        alreadyorderd = Orders.query.filter_by(item_id=form.foodoption.data, e_id=current_user.emp_id).first()
         if alreadyorderd is None:
-            orders = Orders(item_id=form.foodoption.data, e_id=current_user.empid,
+            orders = Orders(item_id=form.foodoption.data, e_id=current_user.emp_id,
                             quantity=form.quantity.data, order_date=datetime_from_utc_to_local())
             db.session.add(orders)
             db.session.commit()
@@ -84,9 +85,8 @@ def menu():
 @app.route("/orders", methods=['GET', 'POST'])
 @login_required
 def Myorders():
-    empid = Employee.query.filter_by(email=current_user.email).first()
     orderdetails = {}
-    for val in Orders().query.filter_by(e_id=current_user.empid).all():
+    for val in Orders().query.filter_by(e_id=current_user.emp_id).all():
         itemName = Items.query.filter_by(itemid=val.item_id).first()
         orderdetails.update({itemName.itemname : (val.quantity,val.id)})
     return render_template("orders.html", data=orderdetails)
@@ -98,7 +98,6 @@ def editorders(order_id):
     itemName = Items.query.filter_by(itemid=order.item_id).first()
     form = ChoiceMenu()
     form.foodoption.choices = [(order.item_id, itemName.itemname)]
-    #print(order.item_id,order.quantity, form.quantity.data)
     if form.validate_on_submit():
         order.item_id = form.foodoption.data
         order.quantity = form.quantity.data
@@ -108,7 +107,8 @@ def editorders(order_id):
     elif request.method == "GET":
         form.foodoption.choices = [(order.item_id, itemName.itemname)]
         form.quantity.data = order.quantity
-    return render_template("menu.html", form=form)
+    return render_template("menu.html", form=form,
+                            disabletime=datetime_from_utc_to_local().timetuple())
 
 @app.route("/orders/<int:order_id>/delete", methods=['GET', 'POST'])
 @login_required
