@@ -1,19 +1,27 @@
 from datetime import datetime
-from app import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
-from app import login, admin
 from flask_admin.contrib.sqla import ModelView
-from flask_admin import BaseView, expose
-from flask_admin.contrib.sqla.filters import FilterEqual
+from app import db, login, admin
 
 @login.user_loader
 def load_user(id):
     return Employee.query.get(int(id))
 
+class EmplyeeMaster(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    employee_id = db.Column(db.String(64), index=True, unique=True)
+
+    def __repr__(self):
+        return '<Employee ID : {}>'.format(self.employee_id)
+
+class SuperUsers(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    emp_id = db.Column(db.String(64), index=True, unique=True)
+
 class Employee(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    ename = db.Column(db.String(64), index=True, unique=True)
+    ename = db.Column(db.String(64), index=True)
     emp_id = db.Column(db.String(64), index=True, unique=True)
     password_hash = db.Column(db.String(128))
     order = db.relationship('Orders', backref='orders', lazy='dynamic')
@@ -48,4 +56,5 @@ class Orders(db.Model):
 class Itemsview(ModelView):
     form_columns = ["itemid", "itemname", "price", "item_nature"]
 
-admin.add_view(Itemsview(Items,db.session))
+admin.add_view(Itemsview(Items, db.session))
+admin.add_view(ModelView(EmplyeeMaster, db.session))

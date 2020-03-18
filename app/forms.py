@@ -3,9 +3,9 @@ from wtforms import (StringField,
                     PasswordField,
                     SubmitField,
                     SelectField, IntegerField, validators)
-from wtforms.validators import DataRequired, Length, Email, EqualTo
+from wtforms.validators import DataRequired, Length, Email, EqualTo,ValidationError
 from wtforms.fields.html5 import DateField
-from app.models import Employee, Items
+from app.models import Employee, Items, EmplyeeMaster
 import datetime
 from datetime import date
 
@@ -23,15 +23,13 @@ class RegistrationForm(FlaskForm):
         'Repeat Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Register')
 
-    def validate_username(self, username):
-        user = Employee.query.filter_by(ename=username.data).first()
-        if user is not None:
+    def validate_emp_id(self, emp_id):
+        already_user = Employee.query.filter_by(emp_id=emp_id.data).first()
+        valid_user = EmplyeeMaster.query.filter_by(employee_id=emp_id.data).first()
+        if already_user is not None:
             raise ValidationError('Employee ID already exists.')
-
-    def validate_email(self, email):
-        user = Employee.query.filter_by(email=email.data).first()
-        if user is not None:
-            raise ValidationError('Please use a different email address.')
+        elif valid_user is None:
+            raise ValidationError('Please Enter Valid Employee ID.')
 
 class ChoiceMenu(FlaskForm):
     foodoption = SelectField("Menu", validators=[DataRequired()],coerce=int)

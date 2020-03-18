@@ -35,7 +35,6 @@ def login():
         return redirect(next_page)
     return render_template('Login/login.html', form=form, title="Login")
 
-lambda x : Employee.query.filter_by()
 
 @app.route('/logout')
 def logout():
@@ -64,7 +63,13 @@ def datetime_from_utc_to_local():
 @app.route("/menu", methods=['GET', 'POST'])
 @login_required
 def menu():
-    today = date.today().strftime("%A")
+    menu_type = request.args.get("ordertype",1,type=int)
+    if menu_type == 1:
+        today = date.today().strftime("%A")
+    elif menu_type == 0:
+        today = "Daily"
+    else:
+        return redirect(url_for('logout'))
     items = Items.query.filter_by(item_nature=today).all()
     form = ChoiceMenu()
     form.foodoption.choices = [(itm.itemid, itm.itemname) for itm in  items]

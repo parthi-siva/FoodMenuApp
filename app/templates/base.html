@@ -20,7 +20,15 @@
                 <div id="navbarSupportedContent" class="collapse navbar-collapse">
                     <ul class="navbar-nav ml-auto">
                         {% if current_user.is_authenticated %}
-                        <li class="nav-item"><a href="{{ url_for('menu') }}" class="nav-link">Menu</a></li>
+                        <div class="dropdown show">
+                            <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Menu
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                <a class="dropdown-item" href="{{ url_for('menu', ordertype=0) }}">Daily</a>
+                                <a class="dropdown-item" href="{{ url_for('menu', ordertype=1) }}">Day Special</a>
+                            </div>
+                        </div>
                         <li class="nav-item"><a href="{{ url_for('Myorders') }}" class="nav-link">Orders</a></li>
                         <li class="nav-item"><a href="{{ url_for('logout') }}" class="nav-link">Logout</a></li>
                         {% else %}
